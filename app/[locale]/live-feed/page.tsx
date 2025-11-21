@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import { analyzeImage } from '@/lib/actions';
+import VideoAnalyzer from '@/components/VideoAnalyzer';
 
 type CongestionStatus = 'empty' | 'few people' | 'moderate' | 'full';
 
@@ -12,6 +12,8 @@ interface FeedData {
   status: CongestionStatus;
   capacity: number;
   timestamp: string;
+  confidence?: number;
+  reasoning?: string;
 }
 
 const statusConfig = {
@@ -30,32 +32,24 @@ export default function LiveFeedScreen() {
     capacity: 85,
     timestamp: new Date().toLocaleTimeString(),
   });
+  const [useVideoAnalyzer, setUseVideoAnalyzer] = useState(true);
 
-  // Real-time analysis
-  useEffect(() => {
-    const analyzeFeed = async () => {
-      // Replace with your actual video feed image URL
-      const imageUrl = 'YOUR_IMAGE_URL_HERE';
-
-      try {
-        const result = await analyzeImage(imageUrl);
-
-        setFeedData(prev => ({
-          ...prev,
-          status: result.status,
-          capacity: result.capacity,
-          timestamp: new Date().toLocaleTimeString(),
-        }));
-      } catch (error) {
-        console.error('Failed to analyze feed:', error);
-      }
-    };
-
-    // Uncomment to enable real-time analysis
-    // analyzeFeed();
-    // const interval = setInterval(analyzeFeed, 30000); // Update every 30 seconds
-    // return () => clearInterval(interval);
-  }, []);
+  // Handle real-time analysis results from video
+  const handleAnalysis = (result: {
+    status: CongestionStatus;
+    capacity: number;
+    confidence: number;
+    reasoning: string;
+  }) => {
+    setFeedData({
+      carriageNumber: feedData.carriageNumber,
+      status: result.status,
+      capacity: result.capacity,
+      confidence: result.confidence,
+      reasoning: result.reasoning,
+      timestamp: new Date().toLocaleTimeString(),
+    });
+  };
 
   const config = statusConfig[feedData.status];
 
@@ -96,53 +90,20 @@ export default function LiveFeedScreen() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Video Feed - Takes up 2 columns */}
           <div className="lg:col-span-2 space-y-4">
-            {/* Video Container */}
-            <div className="bg-black rounded-2xl shadow-2xl overflow-hidden aspect-video relative">
-              {/* Video placeholder - Replace with actual video stream */}
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900">
-                <div className="text-center space-y-4">
-                  <div className="text-white/40 text-6xl">📹</div>
-                  <div className="text-white/60 text-xl font-medium">
-                    {t('cameraFeed')}
-                  </div>
-                  <div className="text-white/40 text-sm">
-                    {t('videoPlaceholder')}
-                  </div>
+            <div className="bg-white rounded-2xl shadow-2xl p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800">Live Video Feed</h2>
+                  <p className="text-sm text-slate-600 mt-1">
+                    {t('carriage')} #{feedData.carriageNumber} • {feedData.timestamp}
+                  </p>
                 </div>
               </div>
-
-              {/* Overlay Info */}
-              <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                <div className="bg-black/70 backdrop-blur-sm rounded-lg px-4 py-2 text-white">
-                  <div className="text-sm opacity-75">{t('carriage')}</div>
-                  <div className="text-3xl font-bold">#{feedData.carriageNumber}</div>
-                </div>
-                <div className="bg-black/70 backdrop-blur-sm rounded-lg px-4 py-2 text-white text-sm">
-                  {feedData.timestamp}
-                </div>
-              </div>
-            </div>
-
-            {/* Video Controls */}
-            <div className="bg-white rounded-xl shadow-lg p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex gap-3">
-                  <button className="px-6 py-3 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-700 transition-colors">
-                    {t('pause')}
-                  </button>
-                  <button className="px-6 py-3 bg-slate-200 text-slate-800 rounded-lg font-medium hover:bg-slate-300 transition-colors">
-                    {t('snapshot')}
-                  </button>
-                </div>
-                <div className="flex items-center gap-2 text-slate-600">
-                  <span className="text-sm font-medium">{t('quality')}:</span>
-                  <select className="px-3 py-2 border border-slate-300 rounded-lg text-sm">
-                    <option>1080p</option>
-                    <option>720p</option>
-                    <option>480p</option>
-                  </select>
-                </div>
-              </div>
+              <VideoAnalyzer
+                onAnalysis={handleAnalysis}
+                intervalMs={5000}
+                autoStart={false}
+              />
             </div>
           </div>
 
@@ -177,23 +138,43 @@ export default function LiveFeedScreen() {
               </div>
             </div>
 
-            {/* Statistics Card */}
+            {/* AI Analysis Card */}
             <div className="bg-white rounded-2xl shadow-xl p-6 space-y-4">
-              <h2 className="text-xl font-bold text-slate-800">{t('statistics')}</h2>
+              <h2 className="text-xl font-bold text-slate-800">AI Analysis</h2>
 
               <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">{t('peakTime')}</span>
-                  <span className="font-semibold text-slate-800">8:00 AM</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">{t('averageToday')}</span>
-                  <span className="font-semibold text-slate-800">67%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">{t('passengers')}</span>
-                  <span className="font-semibold text-slate-800">~42</span>
-                </div>
+                {feedData.confidence !== undefined && (
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-slate-600">Confidence</span>
+                      <span className="font-semibold text-slate-800">
+                        {feedData.confidence}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="h-full bg-purple-500 transition-all duration-500"
+                        style={{ width: `${feedData.confidence}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+                {feedData.reasoning && (
+                  <div className="pt-2 border-t border-slate-200">
+                    <span className="text-slate-600 text-sm font-medium">Reasoning:</span>
+                    <p className="text-slate-700 text-sm mt-1 leading-relaxed">
+                      {feedData.reasoning}
+                    </p>
+                  </div>
+                )}
+                {!feedData.confidence && !feedData.reasoning && (
+                  <div className="text-center py-8">
+                    <div className="text-slate-400 text-4xl mb-3">🤖</div>
+                    <p className="text-slate-500 text-sm">
+                      Start video analysis to see AI insights
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

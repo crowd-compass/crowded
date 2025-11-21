@@ -43,20 +43,14 @@ const statusConfig = {
 export default function CarriageStatusScreen() {
   const t = useTranslations('status');
 
-  const [currentCarriage, setCurrentCarriage] = useState<number>(4);
+  const [currentCarriage, setCurrentCarriage] = useState<number>(3);
   const [allCarriages, setAllCarriages] = useState<CarriageData[]>([
     { carriageNumber: 1, status: 'few people', capacity: 45 },
     { carriageNumber: 2, status: 'moderate', capacity: 75 },
-    { carriageNumber: 3, status: 'full', capacity: 95 },
-    { carriageNumber: 4, status: 'moderate', capacity: 85 },
-    { carriageNumber: 5, status: 'full', capacity: 98 },
-    { carriageNumber: 6, status: 'moderate', capacity: 80 },
-    { carriageNumber: 7, status: 'few people', capacity: 55 },
-    { carriageNumber: 8, status: 'empty', capacity: 30 },
-    { carriageNumber: 9, status: 'few people', capacity: 50 },
-    { carriageNumber: 10, status: 'empty', capacity: 35 },
+    { carriageNumber: 3, status: 'moderate', capacity: 85 },
+    { carriageNumber: 4, status: 'full', capacity: 95 },
+    { carriageNumber: 5, status: 'empty', capacity: 30 },
   ]);
-  const [showVideoInput, setShowVideoInput] = useState(false);
 
   // Handle real-time analysis results from video
   const handleAnalysis = (result: { status: CongestionStatus; capacity: number }) => {
@@ -85,9 +79,11 @@ export default function CarriageStatusScreen() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-900 via-slate-900 to-slate-800 p-6">
       <LanguageSwitcher />
-      <div className="w-full max-w-7xl">
-        {/* Main Card */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-[1800px]">
+        {/* Main Content - Grid Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          {/* Main Card */}
+          <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
           {/* Header Section */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
             <div className="flex items-center justify-between">
@@ -262,32 +258,22 @@ export default function CarriageStatusScreen() {
           </div>
         </div>
 
-        {/* Video Input Section */}
-        <div className="mt-6">
-          <button
-            onClick={() => setShowVideoInput(!showVideoInput)}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all"
-          >
-            {showVideoInput ? '📊 Hide Video Input' : '📹 Enable Live Video Analysis'}
-          </button>
-
-          {showVideoInput && (
-            <div className="mt-6 bg-white rounded-3xl shadow-2xl p-8">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-800 mb-2">
-                  Live Video Analysis
-                </h2>
-                <p className="text-slate-600">
-                  Upload a video or use your webcam to analyze carriage {currentCarriage} in real-time
-                </p>
-              </div>
-              <VideoAnalyzer
-                onAnalysis={handleAnalysis}
-                intervalMs={5000}
-                autoStart={false}
-              />
+          {/* Video Input Section */}
+          <div className="bg-white rounded-3xl shadow-2xl p-8 h-fit">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-slate-800 mb-2">
+                Live Video Analysis
+              </h2>
+              <p className="text-slate-600">
+                Upload a video or use your webcam to analyze carriage {currentCarriage} in real-time
+              </p>
             </div>
-          )}
+            <VideoAnalyzer
+              onAnalysis={handleAnalysis}
+              intervalMs={5000}
+              autoStart={false}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -28,7 +28,7 @@ export default function VideoAnalyzer({
   const [isAnalyzing, setIsAnalyzing] = useState(autoStart);
   const [useWebcam, setUseWebcam] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Capture frame and convert to base64
   const captureFrame = (): string | null => {
