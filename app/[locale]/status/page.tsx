@@ -65,7 +65,7 @@ export default function CarriageStatusScreen() {
 
   // Handle carriage selection
   const handleCarriageClick = (carriageNumber: number) => {
-    console.log(`[Status Page] Selected carriage ${carriageNumber}, loading video: ${CARRIAGE_VIDEOS[carriageNumber]}`);
+    console.log(`[Status] Selected carriage ${carriageNumber}`);
     currentCarriageRef.current = carriageNumber;
     setCurrentCarriage(carriageNumber);
     setVideoUrl(CARRIAGE_VIDEOS[carriageNumber]);
@@ -75,19 +75,15 @@ export default function CarriageStatusScreen() {
   // Use ref to always get the latest carriage number
   const handleAnalysis = useCallback((result: { status: CongestionStatus; capacity: number }) => {
     const targetCarriage = currentCarriageRef.current;
-    console.log(`[Status Page] *** Received analysis result for carriage ${targetCarriage}:`, result);
+    console.log(`[Status] Updating carriage ${targetCarriage}:`, { status: result.status, capacity: result.capacity });
 
-    setAllCarriages(prev => {
-      const updated = prev.map(carriage => {
-        if (carriage.carriageNumber === targetCarriage) {
-          console.log(`[Status Page] *** Updating carriage ${targetCarriage} from capacity ${carriage.capacity} to ${result.capacity}, status from ${carriage.status} to ${result.status}`);
-          return { ...carriage, status: result.status, capacity: result.capacity };
-        }
-        return carriage;
-      });
-      console.log('[Status Page] *** New carriages state:', updated);
-      return updated;
-    });
+    setAllCarriages(prev =>
+      prev.map(carriage =>
+        carriage.carriageNumber === targetCarriage
+          ? { ...carriage, status: result.status, capacity: result.capacity }
+          : carriage
+      )
+    );
   }, []);
 
   const currentCarriageData = allCarriages.find(c => c.carriageNumber === currentCarriage);

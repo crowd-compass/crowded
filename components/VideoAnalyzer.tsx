@@ -54,19 +54,15 @@ export default function VideoAnalyzer({
   // Analyze current frame
   const analyzeCurrentFrame = async () => {
     try {
-      console.log('[VideoAnalyzer] Capturing frame for analysis...');
       const frameData = captureFrame();
       if (!frameData) {
         console.warn('[VideoAnalyzer] Failed to capture frame');
         return;
       }
 
-      console.log('[VideoAnalyzer] Sending frame to AI for analysis...');
       const result = await analyzeImage(frameData);
-      console.log('[VideoAnalyzer] *** Received analysis result:', result);
-      console.log('[VideoAnalyzer] *** Calling onAnalysis callback with result');
+      console.log('[VideoAnalyzer] Analysis complete:', { status: result.status, capacity: result.capacity });
       onAnalysis(result);
-      console.log('[VideoAnalyzer] *** onAnalysis callback completed');
     } catch (error) {
       console.error('[VideoAnalyzer] Analysis error:', error);
     }
