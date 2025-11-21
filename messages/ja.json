@@ -43,5 +43,20 @@
     "pause": "一時停止",
     "snapshot": "スナップショット",
     "quality": "品質"
+  },
+  "lines": {
+    "title": "地下鉄路線",
+    "subtitle": "駅を選択してリアルタイム混雑状況を確認",
+    "stationCount": "{count}駅",
+    "backToHome": "ホームに戻る",
+    "empty": "空いています",
+    "fewPeople": "少し混雑",
+    "moderate": "混雑",
+    "full": "満員"
+  },
+  "stations": {
+    "selectStation": "駅を選択してリアルタイム混雑状況を確認",
+    "lineNotFound": "路線が見つかりません",
+    "backToLines": "路線一覧に戻る"
   }
 }

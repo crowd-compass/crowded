@@ -43,5 +43,20 @@
     "pause": "Pause",
     "snapshot": "Snapshot",
     "quality": "Quality"
+  },
+  "lines": {
+    "title": "Metro Lines",
+    "subtitle": "Select a station to view real-time congestion status",
+    "stationCount": "{count} stations",
+    "backToHome": "Back to Home",
+    "empty": "Empty",
+    "fewPeople": "Few People",
+    "moderate": "Moderate",
+    "full": "Full"
+  },
+  "stations": {
+    "selectStation": "Select a station to view real-time congestion",
+    "lineNotFound": "Line not found",
+    "backToLines": "Back to Metro Lines"
   }
 }

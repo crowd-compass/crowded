@@ -24,7 +24,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 gap-6 pt-8">
             <Link
-              href="/status"
+              href="/lines"
               className="group bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-2xl p-8 shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-105"
             >
               <div className="text-center space-y-4">

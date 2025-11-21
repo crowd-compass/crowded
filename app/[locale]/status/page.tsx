@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import VideoAnalyzer from '@/components/VideoAnalyzer';
 
@@ -42,6 +43,11 @@ const statusConfig = {
 
 export default function CarriageStatusScreen() {
   const t = useTranslations('status');
+  const searchParams = useSearchParams();
+
+  // Get station name from URL params, default to '下北沢'
+  const stationName = searchParams.get('station') || '下北沢';
+  const stationNameEn = searchParams.get('stationEn') || 'Shimokitazawa';
 
   const [currentCarriage, setCurrentCarriage] = useState<number>(3);
   const [allCarriages, setAllCarriages] = useState<CarriageData[]>([
@@ -95,7 +101,7 @@ export default function CarriageStatusScreen() {
               </div>
               <div className="text-right">
                 <div className="text-blue-100 text-sm">{t('nextTrain', { minutes: 3 })}</div>
-                <div className="text-white text-2xl font-bold mt-1">下北沢</div>
+                <div className="text-white text-2xl font-bold mt-1">{stationName}</div>
               </div>
             </div>
           </div>
