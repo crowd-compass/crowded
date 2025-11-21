@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import VideoAnalyzer from '@/components/VideoAnalyzer';
 
 type CongestionStatus = 'empty' | 'few people' | 'moderate' | 'full';
 
@@ -42,9 +43,8 @@ const statusConfig = {
 export default function CarriageStatusScreen() {
   const t = useTranslations('status');
 
-  // Mock data - in production, this would come from your backend
-  const [currentCarriage] = useState<number>(4);
-  const [allCarriages] = useState<CarriageData[]>([
+  const [currentCarriage, setCurrentCarriage] = useState<number>(4);
+  const [allCarriages, setAllCarriages] = useState<CarriageData[]>([
     { carriageNumber: 1, status: 'few people', capacity: 45 },
     { carriageNumber: 2, status: 'moderate', capacity: 75 },
     { carriageNumber: 3, status: 'full', capacity: 95 },
@@ -56,6 +56,18 @@ export default function CarriageStatusScreen() {
     { carriageNumber: 9, status: 'few people', capacity: 50 },
     { carriageNumber: 10, status: 'empty', capacity: 35 },
   ]);
+  const [showVideoInput, setShowVideoInput] = useState(false);
+
+  // Handle real-time analysis results from video
+  const handleAnalysis = (result: { status: CongestionStatus; capacity: number }) => {
+    setAllCarriages(prev =>
+      prev.map(carriage =>
+        carriage.carriageNumber === currentCarriage
+          ? { ...carriage, status: result.status, capacity: result.capacity }
+          : carriage
+      )
+    );
+  };
 
   const currentCarriageData = allCarriages.find(c => c.carriageNumber === currentCarriage);
   const config = currentCarriageData ? statusConfig[currentCarriageData.status] : statusConfig.moderate;
@@ -248,6 +260,34 @@ export default function CarriageStatusScreen() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Video Input Section */}
+        <div className="mt-6">
+          <button
+            onClick={() => setShowVideoInput(!showVideoInput)}
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all"
+          >
+            {showVideoInput ? '📊 Hide Video Input' : '📹 Enable Live Video Analysis'}
+          </button>
+
+          {showVideoInput && (
+            <div className="mt-6 bg-white rounded-3xl shadow-2xl p-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-slate-800 mb-2">
+                  Live Video Analysis
+                </h2>
+                <p className="text-slate-600">
+                  Upload a video or use your webcam to analyze carriage {currentCarriage} in real-time
+                </p>
+              </div>
+              <VideoAnalyzer
+                onAnalysis={handleAnalysis}
+                intervalMs={5000}
+                autoStart={false}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

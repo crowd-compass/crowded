@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { analyzeImage } from '@/lib/actions';
 
 type CongestionStatus = 'empty' | 'few people' | 'moderate' | 'full';
 
@@ -23,13 +24,38 @@ const statusConfig = {
 export default function LiveFeedScreen() {
   const t = useTranslations('liveFeed');
 
-  // Mock data - in production, this would come from your backend
-  const [feedData] = useState<FeedData>({
+  const [feedData, setFeedData] = useState<FeedData>({
     carriageNumber: 4,
     status: 'moderate',
     capacity: 85,
     timestamp: new Date().toLocaleTimeString(),
   });
+
+  // Real-time analysis
+  useEffect(() => {
+    const analyzeFeed = async () => {
+      // Replace with your actual video feed image URL
+      const imageUrl = 'YOUR_IMAGE_URL_HERE';
+
+      try {
+        const result = await analyzeImage(imageUrl);
+
+        setFeedData(prev => ({
+          ...prev,
+          status: result.status,
+          capacity: result.capacity,
+          timestamp: new Date().toLocaleTimeString(),
+        }));
+      } catch (error) {
+        console.error('Failed to analyze feed:', error);
+      }
+    };
+
+    // Uncomment to enable real-time analysis
+    // analyzeFeed();
+    // const interval = setInterval(analyzeFeed, 30000); // Update every 30 seconds
+    // return () => clearInterval(interval);
+  }, []);
 
   const config = statusConfig[feedData.status];
 
