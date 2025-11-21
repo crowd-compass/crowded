@@ -20,7 +20,7 @@ export default function TestPage() {
   const [newChatMessage, setNewChatMessage] = useState('');
 
   // Vision state
-  const [visionPrompt, setVisionPrompt] = useState('Analyze this Tokyo metro train image and provide: capacity_percentage (estimated % of capacity filled), people_count (number of visible people), normal_free_seat_num (number of available regular seats), senior_seat_num (number of available priority seats). Return in JSON format.');
+  const [visionPrompt, setVisionPrompt] = useState('Analyze this Tokyo metro train image. Count the number of people and available seats. Return ONLY a JSON object with these exact fields: capacity_percentage (0-100), people_count, vacant_regular_seat_num, vacant_senior_seat_num.');
   const [imageUrl, setImageUrl] = useState('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0');
   const [imageBase64, setImageBase64] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -430,15 +430,15 @@ export default function TestPage() {
                         </p>
                       </div>
                       <div className="bg-white rounded p-3">
-                        <p className="text-xs text-gray-600 mb-1">Free Normal Seats</p>
+                        <p className="text-xs text-gray-600 mb-1">Vacant Regular Seats</p>
                         <p className="text-2xl font-bold text-purple-600">
-                          {response.data.structuredData.normal_free_seat_num ?? 'N/A'}
+                          {response.data.structuredData.vacant_regular_seat_num ?? 'N/A'}
                         </p>
                       </div>
                       <div className="bg-white rounded p-3">
-                        <p className="text-xs text-gray-600 mb-1">Free Senior Seats</p>
+                        <p className="text-xs text-gray-600 mb-1">Vacant Senior Seats</p>
                         <p className="text-2xl font-bold text-purple-600">
-                          {response.data.structuredData.senior_seat_num ?? 'N/A'}
+                          {response.data.structuredData.vacant_senior_seat_num ?? 'N/A'}
                         </p>
                       </div>
                     </div>
